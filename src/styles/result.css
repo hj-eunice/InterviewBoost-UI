@@ -1,0 +1,102 @@
+.result-page {
+  width: 100%;
+  min-height: 100vh;
+}
+.result-section {
+  width: 100%;
+  height: 100%;
+  padding: 12.5rem 0 0 0;
+}
+.result-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.result-content img {
+  width: 10rem;
+  object-fit: contain;
+}
+
+.result-content h3 {
+  font-size: 3rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 2.5rem 0 5rem 0;
+}
+.result-box {
+  width: 100%;
+}
+.result-box .accordion {
+  margin: 0 0 2.5rem 0;
+  border-radius: 1.5rem;
+  border: 1px solid #f2f2f2;
+  background: #fff;
+  overflow: hidden;
+}
+.card-body {
+  font-size: 1.65rem;
+}
+.card-body img {
+  width: 4rem;
+  object-fit: contain;
+  margin: 2rem 0 0 0;
+  cursor: pointer;
+}
+.result-box .card-body {
+  padding: 2rem 2rem 0 2rem;
+}
+.result-box .card-body p {
+  margin: 0;
+}
+.card {
+  padding: 2rem 0;
+  border-radius: 2.5rem;
+  border: 0 !important;
+  outline: 0 !important;
+}
+.result-box .card-header {
+  padding: 0 2rem;
+  background-color: var(--white);
+  overflow: hidden;
+  border: 0;
+}
+.result-box .card-header button.btn.btn-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  padding: 0;
+}
+.result-box .card-header button.btn.btn-link p {
+  font-size: 2rem;
+  color: var(--black);
+  margin: 0;
+  font-weight: 500;
+  width: 90%;
+  text-align: left;
+}
+.result-box .card-header button.btn.btn-link svg {
+  font-size: 2.75rem;
+  color: var(--black);
+}
+.result-box .card-header button.btn.btn-link > div {
+}
+.result-box .answer-number {
+  margin: 0;
+}
+.result-box .collapse:not(.show) {
+  display: block;
+}
+
+@media screen and (max-width: 750px) {
+  .result-box .card-header button.btn.btn-link p {
+    line-height: 2.25rem;
+    font-size: 1.85rem;
+  }
+  .result-box .answer-number {
+    margin: 0 0 1rem 0;
+  }
+}

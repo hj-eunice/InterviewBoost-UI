@@ -1,0 +1,124 @@
+.answer-page {
+  width: 100%;
+  min-height: 100vh;
+}
+.answer-section {
+  width: 100%;
+  height: 100%;
+}
+.prog {
+  width: 0%;
+  height: 5px;
+  background-color: var(--btn-blue);
+  position: absolute;
+  top: 6rem;
+  z-index: 1000;
+}
+.timer {
+  width: max-content;
+  font-size: 1.25rem;
+  position: absolute;
+  top: 7.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 1000;
+  color: #1373ea;
+  display: none;
+}
+
+.answer-section-top {
+  background: var(--bg-grd-2);
+  width: 100%;
+  height: 100%;
+  padding: 12.5rem 0 2.5rem 0;
+  height: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.answer-content {
+  width: 100%;
+}
+.answer-number {
+  background-color: var(--btn-blue);
+  font-size: 1.25rem;
+  border-radius: 1000px;
+  display: flex;
+  padding: 0.35rem 0.75rem;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  color: var(--white);
+  margin: 0 0 1rem 0;
+}
+.answer-content h3 {
+  font-size: 3rem;
+  font-weight: 500;
+}
+.answer-btn-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 6rem;
+  position: relative;
+}
+.pause-play-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(0, -50%);
+}
+.pause-play-box img {
+  width: 100%;
+  cursor: pointer;
+}
+.answer-btn-box button {
+  margin: 0 1rem;
+}
+.btn-flexbox {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.answer-textbox {
+  width: 100%;
+  height: calc(100vh - 36rem);
+  padding: 1.5rem 0 0 0;
+}
+.answer-textbox textarea {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 2rem;
+  outline: 0;
+  border: 0;
+  resize: none;
+  font-size: 1.6rem;
+  line-height: 2.8rem;
+  background-color: transparent;
+}
+.answer-textbox textarea:disabled {
+  background-color: transparent;
+}
+.answer-textbox textarea::-webkit-scrollbar {
+  width: 0.65rem;
+}
+.answer-textbox textarea::-webkit-scrollbar-track {
+  border-radius: 1000px;
+  background-color: transparent;
+}
+.answer-textbox textarea::-webkit-scrollbar-thumb {
+  border-radius: 1000px;
+  background: #c0c0c0;
+}
+@media screen and (max-width: 750px) {
+}
