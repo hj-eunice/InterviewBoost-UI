@@ -11,6 +11,10 @@ const Header = (props) => {
               <Link to="/quiz1" className="btn-blue">
                 Practice again
               </Link>
+            ) : props.clickEventHandler ? (
+              <Link to={props.to} onClick={props.clickEventHandler}>
+                <MdArrowBack /> <span>{props.toText}</span>
+              </Link>
             ) : (
               <Link to={props.to}>
                 <MdArrowBack /> <span>{props.toText}</span>

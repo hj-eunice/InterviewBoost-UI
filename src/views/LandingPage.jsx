@@ -14,7 +14,7 @@ const LandingPage = () => {
               your next interview with practice key questions, gain valuable
               insights into your answers, and enhance your interviewing skills
             </p>
-            <Link className="btn-blue" to="/quiz1">
+            <Link className="btn-blue" to="/begin">
               Start practicing
             </Link>
           </div>
