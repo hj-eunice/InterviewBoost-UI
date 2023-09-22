@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from 'react-router-dom';
+
 import "../styles/answer.css";
 import "../styles/quiz.css";
 import { Link } from "react-router-dom";
@@ -11,6 +13,9 @@ import { gsap } from "gsap";
 import $ from "jquery";
 
 const Answer = () => {
+
+  const location = useLocation();
+
   const timelineRef = useRef(null);
   const intervalRef = useRef(null);
   const [giveAnswer, setGiveAnswer] = useState(true);
@@ -156,7 +161,7 @@ const Answer = () => {
   return (
     <main className="ib">
       <div className="answer-page">
-        <Header to="/quiz2" toText="Your difficulty level?" />
+        <Header to="/begin" toText="Your difficulty level?" />
         <section className="answer-section">
           {/* style={{ color: color }} */}
           <div className="prog"></div>
@@ -167,7 +172,7 @@ const Answer = () => {
             <div className="box">
               <div className="answer-content">
                 <span className="answer-number">1/10</span>
-                <h3>How did you handle the significant challenge?</h3>
+                <h3>{location.state.question}</h3>
               </div>
             </div>
           </div>

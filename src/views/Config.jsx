@@ -1,66 +1,77 @@
-import React, { Component } from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import JobTitle from './JobTitle';
 import JobLevel from './JobLevel';
-// import Confirm from './Confirm';
-// import Success from './Success';
 
-export default class Config extends Component {
-  state = {
-    step: 1,
-    jobTitle: '',
-    jobLevel: ''
-  };
+const Config = () => {
+
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    jobTitle: "",
+    jobLevel: ""
+  });
 
   // Proceed to next step
-  nextStep = () => {
-    const { step } = this.state;
-    this.setState({
-      step: step + 1
-    });
-  }
+  const nextStep = () => {
+    setStep(step + 1);
+  };
 
   // Go back to prev step
-  prevStep = () => {
-    const { step } = this.state;
-    this.setState({
-      step: step - 1
-    });
-  }
+  const prevStep = () => {
+    setStep(step - 1);
+  };
 
   // Handle fields change
-  handleChange = (input, e) => {
-    this.setState({ [input]: e.target.value });
-  }
+  const handleFormData = (input, e) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [input]: e.target.value
+    }));
+  };
 
-  componentDidUpdate(prevProps, prevState) {
-    console.log(this.state, prevState);
-  }
+  switch (step) {
+    case 1:
+      return (
+        <JobTitle
+          nextStep={nextStep}
+          handleFormData={handleFormData}
+        />
+      );
+    case 2:
+      return (
+        <JobLevel
+          nextStep={nextStep}
+          prevStep={prevStep}
+          handleFormData={handleFormData}
+        />
+      );
+    case 3:
+      const data = new FormData();
+      data.append("job_title", formData.jobTitle);
+      data.append("job_level", formData.jobLevel);
 
-  render() {
-    const { step } = this.state;
-    const { jobTitle, jobLevel } = this.state;
-    const values = { jobTitle, jobLevel };
+      const req = {
+        method: "POST",
+        body: data
+      };
+      
+      fetch("http://localhost:8080/questions/first", req)
+      .then(resp => resp.json())
+      .then(json => navigate("/answer", {
+        state: {
+          question: json.question
+        }
+      }))
+      .catch(err => console.log(err));
+      
+      break;
 
-    switch (step) {
-      case 1:
-        return (
-          <JobTitle
-            nextStep={this.nextStep}
-            handleChange={this.handleChange}
-            values={values}
-          />
-        );
-      case 2:
-        return (
-          <JobLevel
-            nextStep={this.nextStep}
-            prevStep={this.prevStep}
-            handleChange={this.handleChange}
-            values={values}
-          />
-        );
-      default:
-        (console.log('This is a multi-step form built with React.'))
-    }
+    default:
+      (console.log(formData))
   }
 }
+
+export default Config;
