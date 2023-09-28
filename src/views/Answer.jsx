@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from 'react-router-dom';
 
+import RecordRTC from 'recordrtc';
+
 import "../styles/answer.css";
 import "../styles/quiz.css";
 import { Link } from "react-router-dom";
@@ -28,6 +30,57 @@ const Answer = () => {
   const [isActive, setIsActive] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isTextareaDisabled, setIsTextareaDisabled] = useState(false);
+
+  // start of audio recording
+  const recorderRef = useRef(null);
+  const audioRef = useRef(new Audio());
+  const micRef = useRef(null);
+
+  const handleStartRecording = () => {
+    // make sure to stop the audio
+    handleStopAudio();
+
+    if (!micRef.current) {
+      navigator.mediaDevices.getUserMedia({
+        audio: true
+      }).then(mic => {
+        micRef.current = mic;
+
+        recorderRef.current = new RecordRTC(mic, { type: 'audio' });
+        recorderRef.current.startRecording();
+      }).catch(error => {
+        alert('Unable to capture your microphone. Please check console logs.');
+        return;
+      });
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (recorderRef.current.getState() !== "recording") return;
+
+    recorderRef.current.stopRecording(() => {
+      audioRef.current.src = recorderRef.current.toURL();
+
+      micRef.current.stop();
+      micRef.current = null;
+    });
+  };
+
+  const handlePlayAudio = () => {
+    audioRef.current.onended = () => {
+      setIsAudioPlaying(false);
+    };
+    audioRef.current.play();
+    setIsAudioPlaying(true);
+  };
+
+  const handleStopAudio = () => {
+    audioRef.current.pause();
+    audioRef.currentTime = 0;
+
+    setIsAudioPlaying(false);
+  };
+  // end of audio recording
 
   useEffect(() => {
     timelineRef.current = gsap.timeline({
@@ -111,8 +164,10 @@ const Answer = () => {
   const secondsDisplay = String(seconds).padStart(2, "0");
   const handleAnswerClick = () => {
     setShowTimer(true);
+    handleStartRecording();
   };
   const handleDoneClick = () => {
+    handleStopRecording();
     clearInterval(intervalRef.current);
   };
   const handleRedoClick = () => {
@@ -122,6 +177,7 @@ const Answer = () => {
     setSeconds(0);
     setColor("#1373ea");
     setShowTimer(true);
+    handleStartRecording();
   };
   const toggleTextareaDisable = () => {
     setIsTextareaDisabled(!isTextareaDisabled);
@@ -137,12 +193,14 @@ const Answer = () => {
     let timer;
     if (startFunction) {
       timer = setTimeout(() => {
+        handleStopRecording();
+
         setGiveAnswer(false);
         setDoneGivingAnswer(false);
         setReDoAnswer(true);
         timelineRef.current.pause();
-        handleDoneClick();
-        toggleTextareaDisable();
+        clearInterval(intervalRef.current);
+        setStartFunction(false);
       }, 242000); // 240,000 milliseconds = 4 minutes
     }
 
@@ -192,6 +250,7 @@ const Answer = () => {
                       {isAudioPlaying ? (
                         <img
                           onClick={() => {
+                            audioRef.current.pause();
                             setIsAudioPlaying(false);
                           }}
                           src={PauseIcon}
@@ -200,7 +259,7 @@ const Answer = () => {
                       ) : (
                         <img
                           onClick={() => {
-                            setIsAudioPlaying(true);
+                            handlePlayAudio();
                           }}
                           src={PlayIcon}
                           alt="PlayIcon"
@@ -255,6 +314,7 @@ const Answer = () => {
                         timelineRef.current.restart();
                         handleRedoClick();
                         toggleTextareaDisable();
+                        handleRedoNextAfterFourMins();
                       }}
                       className="btn-outline"
                     >
