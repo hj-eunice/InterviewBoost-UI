@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import RecordRTC from 'recordrtc';
 
@@ -81,6 +81,15 @@ const Answer = () => {
     setIsAudioPlaying(false);
   };
   // end of audio recording
+
+  const navigate = useNavigate();
+  const handleSubmitAnswer = () => {
+    navigate("/result", {
+      state: {
+        question: location.state.question
+      }
+    })
+  };
 
   useEffect(() => {
     timelineRef.current = gsap.timeline({
@@ -229,7 +238,7 @@ const Answer = () => {
           <div className="answer-section-top">
             <div className="box">
               <div className="answer-content">
-                <span className="answer-number">1/10</span>
+                <span className="answer-number">1/1</span>
                 <h3>{location.state.question}</h3>
               </div>
             </div>
@@ -285,9 +294,7 @@ const Answer = () => {
                       <img src={AnswerIcon} alt="AnswerIcon" />
                       Answer
                     </button>
-                    <Link to="/answer2" className="btn-outline">
-                      Next
-                    </Link>
+                    <button className="btn-outline" onClick={handleSubmitAnswer}>Next</button>
                   </div>
                 ) : null}
                 {doneGivingAnswer ? (
@@ -320,9 +327,7 @@ const Answer = () => {
                     >
                       Redo
                     </button>
-                    <Link to="/answer2" className="btn-blue">
-                      Next
-                    </Link>
+                    <button className="btn-blue" onClick={handleSubmitAnswer}>Next</button>
                   </div>
                 ) : null}
               </div>

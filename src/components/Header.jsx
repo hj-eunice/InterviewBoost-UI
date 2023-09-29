@@ -8,7 +8,7 @@ const Header = (props) => {
         <div className="header-content">
           <div className="header-left">
             {props.showPracticeAgainBtn ? (
-              <Link to="/quiz1" className="btn-blue">
+              <Link to="/begin" className="btn-blue">
                 Practice again
               </Link>
             ) : props.clickEventHandler ? (
