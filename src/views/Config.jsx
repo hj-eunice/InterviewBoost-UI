@@ -58,7 +58,7 @@ const Config = () => {
         body: data
       };
       
-      fetch("http://localhost:8080/questions/first", req)
+      fetch("https://interview-booster-api.onrender.com/questions/first", req)
       .then(resp => resp.json())
       .then(json => navigate("/answer", {
         state: {
