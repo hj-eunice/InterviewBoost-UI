@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LandingPage from "./views/LandingPage";
 import Config from "./views/Config";
 import Answer from "./views/Answer";
@@ -12,6 +12,10 @@ import {
 } from "react-router-dom";
 
 const App = () => {
+  useEffect(() => {
+    document.title = 'InterviewBooster.us';
+  }, []);
+
   return (
     <div>
       <Switch>
