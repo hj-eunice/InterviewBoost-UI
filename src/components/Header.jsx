@@ -22,7 +22,7 @@ const Header = (props) => {
             )}
           </div>
           <div className="header-right">
-            <Link to="/">InterviewBoost</Link>
+            <Link to="/">InterviewBooster</Link>
           </div>
         </div>
       </div>

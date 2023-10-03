@@ -8,7 +8,7 @@ const LandingPage = () => {
       <div className="landing-page">
         <div className="box">
           <div className="landing-page-content">
-            <h1>InterviewBoost</h1>
+            <h1>InterviewBooster</h1>
             <p>
               Ace Product Design and Engineering Interviews. Prepare swiftly for
               your next interview with practice key questions, gain valuable
