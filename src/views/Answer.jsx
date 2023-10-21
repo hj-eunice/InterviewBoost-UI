@@ -46,7 +46,12 @@ const Answer = () => {
       }).then(mic => {
         micRef.current = mic;
 
-        recorderRef.current = new RecordRTC(mic, { type: 'audio' });
+        recorderRef.current = new RecordRTC(mic, {
+          type: 'audio',
+          numberOfAudioChannels: 2,
+          bufferSize: 4096,
+          sampleRate: 44100
+        });
         recorderRef.current.startRecording();
       }).catch(error => {
         alert('Unable to capture your microphone. Please check console logs.');
@@ -84,11 +89,37 @@ const Answer = () => {
 
   const navigate = useNavigate();
   const handleSubmitAnswer = () => {
-    navigate("/result", {
-      state: {
-        question: location.state.question
-      }
-    })
+
+    if (!recorderRef.current || !recorderRef.current.getBlob()) {
+      alert("Please record your answer to submit.");
+      return;
+    }
+
+    var fileReader = new FileReader();
+    fileReader.readAsDataURL(recorderRef.current.getBlob());
+    fileReader.onloadend = () => {
+      var base64String = fileReader.result;
+      var fileBase64 = base64String.substr(base64String.indexOf(',') + 1);
+
+      var data = new FormData();
+      data.append("fileBase64", fileBase64);
+
+      const req = {
+        method: "POST",
+        body: data
+      };
+
+      fetch(process.env.REACT_APP_API_BASE_URL + "/transcribe", req)
+      .then(resp => resp.json())
+      .then(json => navigate("/result", {
+        state: {
+          question: location.state.question,
+          transcript: json.transcript,
+          rawAudio: recorderRef.current.toURL()
+        }
+      }))
+      .catch(err => console.log(err));
+    };
   };
 
   useEffect(() => {
