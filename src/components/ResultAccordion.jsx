@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "../styles/result.css";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
@@ -12,6 +12,23 @@ import PlayIcon from "../assets/img/play-icon.svg";
 const ResultAccordion = (props) => {
   const [open, setOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+
+  const audioRef = useRef(new Audio(props.audioSrc));
+
+  const handlePlayAudio = () => {
+    audioRef.current.onended = () => {
+      setIsAudioPlaying(false);
+    };
+    audioRef.current.play();
+    setIsAudioPlaying(true);
+  };
+
+  const handleStopAudio = () => {
+    audioRef.current.pause();
+    audioRef.currentTime = 0;
+
+    setIsAudioPlaying(false);
+  };
 
   const toggleOpen = () => {
     setOpen(!open);
@@ -45,7 +62,7 @@ const ResultAccordion = (props) => {
               {isAudioPlaying ? (
                 <img
                   onClick={() => {
-                    setIsAudioPlaying(false);
+                    handleStopAudio();
                   }}
                   src={PauseIcon}
                   alt="PlayIcon"
@@ -53,7 +70,7 @@ const ResultAccordion = (props) => {
               ) : (
                 <img
                   onClick={() => {
-                    setIsAudioPlaying(true);
+                    handlePlayAudio();
                   }}
                   src={PlayIcon}
                   alt="PlayIcon"

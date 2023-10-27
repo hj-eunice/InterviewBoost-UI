@@ -11,6 +11,8 @@ const Result = () => {
 
   const location = useLocation();
 
+  const audioUrl = URL.createObjectURL(location.state.rawAudio);
+
   return (
     <main className="result-page">
       <Header to="/begin" showPracticeAgainBtn={true} />
@@ -26,7 +28,7 @@ const Result = () => {
                 resultNo="01/01"
                 question={location.state.question}
                 answer={location.state.transcript}
-                audioSrc={location.state.rawAudio}
+                audioSrc={audioUrl}
               />
               {/*
               <ResultAccordion
