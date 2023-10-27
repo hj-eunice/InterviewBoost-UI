@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
+import LoadingOverlay from 'react-loading-overlay'
 
 import RecordRTC from 'recordrtc';
 
@@ -36,9 +37,15 @@ const Answer = () => {
   const audioRef = useRef(new Audio());
   const micRef = useRef(null);
 
+  // transcription
+  const [transcript, setTranscript] = useState("");
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
   const handleStartRecording = () => {
     // make sure to stop the audio
     handleStopAudio();
+    // reset transcript
+    setTranscript("");
 
     if (!micRef.current) {
       navigator.mediaDevices.getUserMedia({
@@ -60,11 +67,39 @@ const Answer = () => {
     }
   };
 
+  const speechToText = () => {
+    var fileReader = new FileReader();
+    fileReader.readAsDataURL(recorderRef.current.getBlob());
+    fileReader.onloadend = () => {
+      var base64String = fileReader.result;
+      var fileBase64 = base64String.substr(base64String.indexOf(',') + 1);
+
+      var data = new FormData();
+      data.append("fileBase64", fileBase64);
+
+      const req = {
+        method: "POST",
+        body: data
+      };
+
+      fetch(process.env.REACT_APP_API_BASE_URL + "/transcribe", req)
+      .then(resp => resp.json())
+      .then(json => {
+        setTranscript(json.transcript);
+        setIsTranscribing(false);
+      })
+      .catch(err => console.log(err));
+    };
+  };
+
   const handleStopRecording = () => {
     if (recorderRef.current.getState() !== "recording") return;
 
     recorderRef.current.stopRecording(() => {
       audioRef.current.src = recorderRef.current.toURL();
+
+      setIsTranscribing(true);
+      speechToText();
 
       micRef.current.stop();
       micRef.current = null;
@@ -95,31 +130,13 @@ const Answer = () => {
       return;
     }
 
-    var fileReader = new FileReader();
-    fileReader.readAsDataURL(recorderRef.current.getBlob());
-    fileReader.onloadend = () => {
-      var base64String = fileReader.result;
-      var fileBase64 = base64String.substr(base64String.indexOf(',') + 1);
-
-      var data = new FormData();
-      data.append("fileBase64", fileBase64);
-
-      const req = {
-        method: "POST",
-        body: data
-      };
-
-      fetch(process.env.REACT_APP_API_BASE_URL + "/transcribe", req)
-      .then(resp => resp.json())
-      .then(json => navigate("/result", {
-        state: {
-          question: location.state.question,
-          transcript: json.transcript,
-          rawAudio: recorderRef.current.toURL()
-        }
-      }))
-      .catch(err => console.log(err));
-    };
+    navigate("/result", {
+      state: {
+        question: location.state.question,
+        transcript: transcript,
+        rawAudio: recorderRef.current.getBlob()
+      }
+    });
   };
 
   useEffect(() => {
@@ -277,11 +294,19 @@ const Answer = () => {
           <div className="answer-section-bottom">
             <div className="box">
               <div className="answer-textbox">
+                <LoadingOverlay
+                  active={isTranscribing}
+                  spinner
+                  text='Transcribing...'
+                >
                 <textarea
                   disabled={isTextareaDisabled}
                   name=""
                   id=""
+                  defaultValue={transcript}
+                  readOnly
                 ></textarea>
+                </LoadingOverlay>
               </div>
               <div className="answer-btn-box">
                 <div className="pause-play-box">
