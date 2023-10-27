@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import LoadingOverlay from 'react-loading-overlay'
 
 import RecordRTC from 'recordrtc';
 
@@ -294,11 +293,6 @@ const Answer = () => {
           <div className="answer-section-bottom">
             <div className="box">
               <div className="answer-textbox">
-                <LoadingOverlay
-                  active={isTranscribing}
-                  spinner
-                  text='Transcribing...'
-                >
                 <textarea
                   disabled={isTextareaDisabled}
                   name=""
@@ -306,7 +300,6 @@ const Answer = () => {
                   defaultValue={transcript}
                   readOnly
                 ></textarea>
-                </LoadingOverlay>
               </div>
               <div className="answer-btn-box">
                 <div className="pause-play-box">
