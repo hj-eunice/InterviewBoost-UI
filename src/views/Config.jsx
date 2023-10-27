@@ -58,7 +58,7 @@ const Config = () => {
         body: data
       };
       
-      fetch("https://interview-booster-api.onrender.com/questions/first", req)
+      fetch(process.env.REACT_APP_API_BASE_URL + "/questions/first", req)
       .then(resp => resp.json())
       .then(json => navigate("/answer", {
         state: {
@@ -70,7 +70,7 @@ const Config = () => {
       break;
 
     default:
-      (console.log(formData))
+      return;
   }
 }
 
