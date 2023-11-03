@@ -40,18 +40,18 @@ const Config = () => {
           handleFormData={handleFormData}
         />
       );
+    // case 2:
+    //   return (
+    //     <JobLevel
+    //       nextStep={nextStep}
+    //       prevStep={prevStep}
+    //       handleFormData={handleFormData}
+    //     />
+    //   );
     case 2:
-      return (
-        <JobLevel
-          nextStep={nextStep}
-          prevStep={prevStep}
-          handleFormData={handleFormData}
-        />
-      );
-    case 3:
       const data = new FormData();
       data.append("job_title", formData.jobTitle);
-      data.append("job_level", formData.jobLevel);
+      // data.append("job_level", formData.jobLevel);  // skip it for MVP
 
       const req = {
         method: "POST",

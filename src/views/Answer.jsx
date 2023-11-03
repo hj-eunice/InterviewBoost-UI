@@ -275,7 +275,8 @@ const Answer = () => {
   return (
     <main className="ib">
       <div className="answer-page">
-        <Header to="/begin" toText="Your difficulty level?" />
+        {/* <Header to="/begin" toText="Your difficulty level?" /> */}
+        <Header to="/begin" toText="Your career path?" />
         <section className="answer-section">
           {/* style={{ color: color }} */}
           <div className="prog"></div>
