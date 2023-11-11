@@ -1,13 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import "../styles/quiz.css";
 import Header from "../components/Header";
 
-const JobTitle = ({ nextStep, handleFormData }) => {
+// const JobTitle = ({ nextStep, handleFormData }) => {
+const JobTitle = ({ nextStep, formData, handleQuestion }) => {
+
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const submitFormData = e => {
     e.preventDefault();
-    handleFormData('jobTitle', e);
-    nextStep();
+    // handleFormData('jobTitle', e);
+    // nextStep();
+
+    setIsLoading(true);
+
+    formData = {
+      ...formData,
+      "jobTitle": e.target.value
+    }
+
+    const data = new FormData();
+    data.append("job_title", formData.jobTitle);
+
+    const req = {
+      method: "POST",
+      body: data
+    };
+    
+    fetch(process.env.REACT_APP_API_BASE_URL + "/questions/first", req)
+    .then(resp => resp.json())
+    .then(json => {
+      // handleQuestion(json.question);
+      // nextStep();
+      navigate("/answer", {
+        state: {
+          question: json.question,
+          id: json.id,
+        }
+      });
+    })
+    .catch(err => console.log(err));
   };
 
   return (
@@ -31,6 +66,11 @@ const JobTitle = ({ nextStep, handleFormData }) => {
                 </div>
               </div>
             </div>
+            {isLoading && <div className="section-content quiz-content">
+              <p>
+                Loading...
+              </p>
+            </div>}
           </div>
         </section>
       </div>

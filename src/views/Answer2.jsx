@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import RecordRTC from 'recordrtc';
+
 import "../styles/answer.css";
 import "../styles/quiz.css";
 import { Link } from "react-router-dom";
@@ -11,6 +15,9 @@ import { gsap } from "gsap";
 import $ from "jquery";
 
 const Answer2 = () => {
+
+  const location = useLocation();
+
   const timelineRef = useRef(null);
   const intervalRef = useRef(null);
   const [giveAnswer, setGiveAnswer] = useState(true);
@@ -23,6 +30,129 @@ const Answer2 = () => {
   const [isActive, setIsActive] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isTextareaDisabled, setIsTextareaDisabled] = useState(false);
+
+  // start of audio recording
+  const recorderRef = useRef(null);
+  const audioRef = useRef(new Audio());
+  const micRef = useRef(null);
+
+  // transcription
+  const [transcript, setTranscript] = useState("");
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const handleStartRecording = () => {
+    // make sure to stop the audio
+    handleStopAudio();
+    // reset transcript
+    setTranscript("");
+
+    if (!micRef.current) {
+      navigator.mediaDevices.getUserMedia({
+        audio: true
+      }).then(mic => {
+        micRef.current = mic;
+
+        recorderRef.current = new RecordRTC(mic, {
+          type: 'audio',
+          numberOfAudioChannels: 2,
+          bufferSize: 4096,
+          sampleRate: 44100
+        });
+        recorderRef.current.startRecording();
+      }).catch(error => {
+        alert('Unable to capture your microphone. Please check console logs.');
+        return;
+      });
+    }
+  };
+
+  const speechToText = () => {
+    var fileReader = new FileReader();
+    fileReader.readAsDataURL(recorderRef.current.getBlob());
+    fileReader.onloadend = () => {
+      var base64String = fileReader.result;
+      var fileBase64 = base64String.substr(base64String.indexOf(',') + 1);
+
+      var data = new FormData();
+      data.append("fileBase64", fileBase64);
+
+      const req = {
+        method: "POST",
+        body: data
+      };
+
+      fetch(process.env.REACT_APP_API_BASE_URL + "/transcribe", req)
+      .then(resp => resp.json())
+      .then(json => {
+        setTranscript(json.transcript);
+        setIsTranscribing(false);
+      })
+      .catch(err => console.log(err));
+    };
+  };
+
+  const handleStopRecording = () => {
+    if (recorderRef.current.getState() !== "recording") return;
+
+    recorderRef.current.stopRecording(() => {
+      audioRef.current.src = recorderRef.current.toURL();
+
+      setIsTranscribing(true);
+      speechToText();
+
+      micRef.current.stop();
+      micRef.current = null;
+    });
+  };
+
+  const handlePlayAudio = () => {
+    audioRef.current.onended = () => {
+      setIsAudioPlaying(false);
+    };
+    audioRef.current.play();
+    setIsAudioPlaying(true);
+  };
+
+  const handleStopAudio = () => {
+    audioRef.current.pause();
+    audioRef.currentTime = 0;
+
+    setIsAudioPlaying(false);
+  };
+  // end of audio recording
+
+  const navigate = useNavigate();
+  const handleSubmitAnswer = () => {
+
+    if (!recorderRef.current || !recorderRef.current.getBlob()) {
+      alert("Please record your answer to submit.");
+      return;
+    }
+
+    var data = new FormData();
+    data.append("id", location.state.id);
+    data.append("question", "2");  // TODO: make it a variable which holds the current step number
+    data.append("transcript", transcript);
+
+    const req = {
+      method: "POST",
+      body: data
+    };
+
+    fetch(process.env.REACT_APP_API_BASE_URL + "/results", req)
+    .then(resp => resp.json())
+    .then(json => {
+      navigate("/result", {
+        state: {
+          questions: [location.state.first_question, location.state.question],
+          answers: json.answers,
+          first_rawAudio: location.state.first_rawAudio,
+          second_rawAudio: recorderRef.current.getBlob()
+        }
+      });
+    })
+    .catch(err => console.log(err));
+  };
 
   useEffect(() => {
     timelineRef.current = gsap.timeline({
@@ -106,8 +236,10 @@ const Answer2 = () => {
   const secondsDisplay = String(seconds).padStart(2, "0");
   const handleAnswerClick = () => {
     setShowTimer(true);
+    handleStartRecording();
   };
   const handleDoneClick = () => {
+    handleStopRecording();
     clearInterval(intervalRef.current);
   };
   const handleRedoClick = () => {
@@ -117,6 +249,7 @@ const Answer2 = () => {
     setSeconds(0);
     setColor("#1373ea");
     setShowTimer(true);
+    handleStartRecording();
   };
   const toggleTextareaDisable = () => {
     setIsTextareaDisabled(!isTextareaDisabled);
@@ -132,12 +265,14 @@ const Answer2 = () => {
     let timer;
     if (startFunction) {
       timer = setTimeout(() => {
+        handleStopRecording();
+
         setGiveAnswer(false);
         setDoneGivingAnswer(false);
         setReDoAnswer(true);
         timelineRef.current.pause();
-        handleDoneClick();
-        toggleTextareaDisable();
+        clearInterval(intervalRef.current);
+        setStartFunction(false);
       }, 242000); // 240,000 milliseconds = 4 minutes
     }
 
@@ -156,10 +291,8 @@ const Answer2 = () => {
   return (
     <main className="ib">
       <div className="answer-page">
-        <Header
-          to="/answer"
-          toText="How did you handle the significant challenge?"
-        />
+        {/* <Header to="/begin" toText="Your difficulty level?" /> */}
+        <Header to="/begin" toText="Your career path?" />
         <section className="answer-section">
           {/* style={{ color: color }} */}
           <div className="prog"></div>
@@ -169,8 +302,8 @@ const Answer2 = () => {
           <div className="answer-section-top">
             <div className="box">
               <div className="answer-content">
-                <span className="answer-number">2/10</span>
-                <h3>How did you collaborate with your team members?</h3>
+                <span className="answer-number">2/2</span>
+                <h3>{location.state.question}</h3>
               </div>
             </div>
           </div>
@@ -181,6 +314,8 @@ const Answer2 = () => {
                   disabled={isTextareaDisabled}
                   name=""
                   id=""
+                  defaultValue={transcript}
+                  readOnly
                 ></textarea>
               </div>
               <div className="answer-btn-box">
@@ -190,6 +325,7 @@ const Answer2 = () => {
                       {isAudioPlaying ? (
                         <img
                           onClick={() => {
+                            audioRef.current.pause();
                             setIsAudioPlaying(false);
                           }}
                           src={PauseIcon}
@@ -198,7 +334,7 @@ const Answer2 = () => {
                       ) : (
                         <img
                           onClick={() => {
-                            setIsAudioPlaying(true);
+                            handlePlayAudio();
                           }}
                           src={PlayIcon}
                           alt="PlayIcon"
@@ -224,9 +360,7 @@ const Answer2 = () => {
                       <img src={AnswerIcon} alt="AnswerIcon" />
                       Answer
                     </button>
-                    <Link to="/result" className="btn-outline">
-                      Next
-                    </Link>
+                    <button className="btn-outline" onClick={handleSubmitAnswer}>Next</button>
                   </div>
                 ) : null}
                 {doneGivingAnswer ? (
@@ -253,14 +387,13 @@ const Answer2 = () => {
                         timelineRef.current.restart();
                         handleRedoClick();
                         toggleTextareaDisable();
+                        handleRedoNextAfterFourMins();
                       }}
                       className="btn-outline"
                     >
                       Redo
                     </button>
-                    <Link to="/result" className="btn-blue">
-                      Next
-                    </Link>
+                    <button className="btn-blue" onClick={handleSubmitAnswer}>Next</button>
                   </div>
                 ) : null}
               </div>

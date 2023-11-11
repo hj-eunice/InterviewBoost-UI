@@ -129,13 +129,29 @@ const Answer = () => {
       return;
     }
 
-    navigate("/result", {
-      state: {
-        question: location.state.question,
-        transcript: transcript,
-        rawAudio: recorderRef.current.getBlob()
-      }
-    });
+    var data = new FormData();
+    data.append("id", location.state.id);
+    data.append("question", "1");  // TODO: make it a variable which holds the current step number
+    data.append("transcript", transcript);
+
+    const req = {
+      method: "POST",
+      body: data
+    };
+
+    fetch(process.env.REACT_APP_API_BASE_URL + "/submit", req)
+    .then(resp => resp.json())
+    .then(json => {
+      navigate("/answer2", {
+        state: {
+          id: json.id,
+          question: json.question,
+          first_question: location.state.question,
+          first_rawAudio: recorderRef.current.getBlob()
+        }
+      });
+    })
+    .catch(err => console.log(err));
   };
 
   useEffect(() => {
@@ -286,7 +302,7 @@ const Answer = () => {
           <div className="answer-section-top">
             <div className="box">
               <div className="answer-content">
-                <span className="answer-number">1/1</span>
+                <span className="answer-number">1/2</span>
                 <h3>{location.state.question}</h3>
               </div>
             </div>

@@ -32,12 +32,19 @@ const Config = () => {
     }));
   };
 
+  const [question, setQuestion] = useState("");
+  const handleQuestion = (questionText) => {
+    setQuestion(questionText);
+  };
+
   switch (step) {
     case 1:
       return (
         <JobTitle
           nextStep={nextStep}
-          handleFormData={handleFormData}
+          // handleFormData={handleFormData}
+          formData={formData}
+          handleQuestion={handleQuestion}
         />
       );
     // case 2:
@@ -49,23 +56,11 @@ const Config = () => {
     //     />
     //   );
     case 2:
-      const data = new FormData();
-      data.append("job_title", formData.jobTitle);
-      // data.append("job_level", formData.jobLevel);  // skip it for MVP
-
-      const req = {
-        method: "POST",
-        body: data
-      };
-      
-      fetch(process.env.REACT_APP_API_BASE_URL + "/questions/first", req)
-      .then(resp => resp.json())
-      .then(json => navigate("/answer", {
+      navigate("/answer", {
         state: {
-          question: json.question
+          question: question,
         }
-      }))
-      .catch(err => console.log(err));
+      });
       
       break;
 
