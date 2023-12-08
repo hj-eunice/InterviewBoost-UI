@@ -68,7 +68,7 @@ const JobTitle = ({ nextStep, formData, handleQuestion }) => {
             </div>
             {isLoading && <div className="section-content quiz-content">
               <p>
-                Loading...
+                Generating questions...
               </p>
             </div>}
           </div>
