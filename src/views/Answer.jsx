@@ -35,6 +35,7 @@ const Answer = () => {
   const recorderRef = useRef(null);
   const audioRef = useRef(new Audio());
   const micRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
 
   // transcription
   const [transcript, setTranscript] = useState("");
@@ -59,6 +60,7 @@ const Answer = () => {
           sampleRate: 44100
         });
         recorderRef.current.startRecording();
+        setIsRecording(true);
       }).catch(error => {
         alert('Unable to capture your microphone. Please check console logs.');
         return;
@@ -102,6 +104,8 @@ const Answer = () => {
 
       micRef.current.stop();
       micRef.current = null;
+
+      setIsRecording(false);
     });
   };
 
@@ -309,7 +313,12 @@ const Answer = () => {
           </div>
           <div className="answer-section-bottom">
             <div className="box">
-              <div className="answer-textbox">
+              {isRecording && <div className="answer-textbox">
+                <p className="answer-loading-overlay">
+                  Recording...
+                </p>
+              </div>}
+              {!isRecording && <div className="answer-textbox">
                 <textarea
                   disabled={isTextareaDisabled}
                   name=""
@@ -317,7 +326,7 @@ const Answer = () => {
                   defaultValue={transcript}
                   readOnly
                 ></textarea>
-              </div>
+              </div>}
               <div className="answer-btn-box">
                 <div className="pause-play-box">
                   {reDoAnswer ? (
